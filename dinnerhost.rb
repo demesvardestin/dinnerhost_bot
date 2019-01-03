@@ -2,11 +2,12 @@ require 'bundler/inline'
 
 module DinnerHost
   class Config
-    def self.initialize!
-      ## Install Twitter (and other) gems
+    def self.initialize(gems=[])
+      ## Install gems (Twitter installed by default)
       gemfile(true) do
         source 'https://rubygems.org'
-        gem 'twitter'
+        gems << 'twitter'
+        gems.each {|g| gem g rescue next}
       end
     end
 
@@ -28,24 +29,26 @@ module DinnerHost
       ## Create/open a file at root directory (serves as 'db')
       f = File.open("users_reached.txt", "w+")
 
-      ## Every 3 hours, grab 1000 most recent tweets containing keyword,
+      ## Every 3 hours, grab most recent tweets containing keyword,
       ## check if tweet's user has already been reached by going through above file,
       ## reply to tweet, then update file with user's @handle.
       p "Starting tweet search..."
-      counter = 0
-      loops.times.each do ||
+      tweet_count, loop_count = 0, 0
+      loop do
+        break if loop_count == loops
         client.search("#{keyword} -rt", result_type: "recent").take(batch_size).collect do |tweet|
           if !File.readlines(f).select {|l| l.include? tweet.user}.empty?
             client.update("Hey @#{tweet.user}, check out dinnerhost.co, an on-demand booking platform for private cooks!")
             f.write("#{tweet.user}\n")
-            counter += 1
+            tweet_count += 1
             p "Replied to @#{tweet.user}"
           end
         end
         
+        loop_count += 1
         sleep 10800
       end
-      p "Successfully replied to #{counter} tweets! Starting again in 3hrs."
+      p "Successfully replied to #{tweet_count} tweets! Starting again in 3hrs."
     end
   end
 end
