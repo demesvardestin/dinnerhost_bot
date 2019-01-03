@@ -2,12 +2,11 @@ require 'bundler/inline'
 
 module DinnerHost
   class Config
-    def self.initialize(gems=[])
-      ## Install gems (Twitter installed by default)
+    def self.initialize!
+      ## Install Twitter if not already installed
       gemfile(true) do
         source 'https://rubygems.org'
-        gems << 'twitter'
-        gems.each {|g| gem g rescue next}
+        gems 'twitter'
       end
     end
 
