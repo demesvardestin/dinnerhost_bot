@@ -14,8 +14,7 @@ client = DinnerHost::Config.config your_consumer_key, your_consumer_secret, your
 
 #### Dispatch bot
 ```ruby
+## loop_count: how many times you want the bot to go 'tweet hunting'
+## batch_size(optional): how many tweets you want hunted per dispatch (defaults to 1k)
 DinnerHost::Bot.dispatch client, "your_keyword", loop_count, batch_size
 ```
-
-loop_count: how many times you want the bot to go 'tweet hunting'\n
-batch_size(optional): how many tweets you want hunted per dispatch (defaults to 1k)
